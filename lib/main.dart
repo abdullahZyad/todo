@@ -127,19 +127,9 @@ class _MainAppState extends State<MainApp> {
                             Flexible(
                               flex: 3,
                               child: GestureDetector(
-                                onTap: () {
+                                onTap: () async {
                                   setState(() async {
-                                    int i = -1;
-                                    MyTodoBox._todoBox.toMap().forEach((k, v)=>{
-                                      if(v=tempList[index]){i = k},
-                                      print(i),
-                                      print(MyTodoBox._todoBox.getAt(i))
-                                    });
-                                  i!=-1?await MyTodoBox._todoBox.putAt(
-                                      i,
-                                      [(tempList[index][0]),
-                                        (!tempList[index][1])]
-                                  ):null;
+                                    await MyTodoBox().updateIsDone(tempList[index]);
                                   });
                                 },
                                 child: AutoSizeText(
@@ -221,6 +211,18 @@ class MyTodoBox {
   Future<void> removeTodo(List l) async {
     int key=-1;
     _todoBox.toMap().forEach((k, v) => {if(v==l){key=k,print(k)}});
-    key!=-1?_todoBox.delete(key):null;
+    key!=-1?await _todoBox.delete(key):null;
   }
+
+  Future<void> updateIsDone(List l) async {
+    int key=-1;
+    _todoBox.toMap().forEach((k, v) => {if(v==l){key=k,print(k)}});
+    key!=-1?
+    await MyTodoBox._todoBox.putAt(
+        key,
+        [l[0],
+          !(l[1])]
+    ):null;
+  }
+
 }
