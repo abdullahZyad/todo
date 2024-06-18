@@ -217,6 +217,6 @@ class MyTodoBox {
   }
 
   Future<void> removeTodo(List l) async {
-    _todoBox.toMap().forEach((k, v) async => {if(v[0]==l[0]){await _todoBox.remove(k)}});
+    _todoBox.toMap().forEach((k, v) async => {if(v==l){await _todoBox.remove(l)}});
   }
 }
