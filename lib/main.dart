@@ -39,7 +39,7 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     List tempList = [];
-    MyTodoBox._todoBox.foreach((k, v) => {tempList.add(v)});
+    MyTodoBox._todoBox.forEach((k, v) => {tempList.add(v)});
     return SafeArea(
       child: Scaffold(
           backgroundColor: const Color(0xffe2eff1),
@@ -206,13 +206,13 @@ class MyTodoBox {
 
   Future<void> addTodo(List l) async {
     bool b = true;
-    await _todoBox.forEach((k, v) => {if(v[0]==l[0]){b=false}});
+    _todoBox.forEach((k, v) => {if(v[0]==l[0]){b=false}});
     if(b) {
-      _todoBox.add(l);
+      await _todoBox.add(l);
     }
   }
 
   Future<void> removeTodo(List l) async {
-    await _todoBox.forEach((k, v) => {if(v==l){_todoBox.remove(k)}});
+    _todoBox.forEach((k, v) async => {if(v==l){await _todoBox.remove(k)}});
   }
 }
