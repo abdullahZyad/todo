@@ -8,7 +8,7 @@ import 'package:iconly/iconly.dart';
 void main() async {
   await Hive.initFlutter();
   MyTodoBox.mybox = await Hive.openBox('todoBox');
-  MyTodoBox.mybox.put('todoList', []);
+  MyTodoBox.mybox.get('todoList')==null? MyTodoBox.mybox.put('todoList', []) : null;
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(const MaterialApp(
@@ -35,7 +35,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
-    Hive.openBox('todoList');
+    Hive.openBox('todoBox');
     return SafeArea(
       child: Scaffold(
           backgroundColor: (DateTime.now().hour > 20 || DateTime.now().hour < 4)
@@ -58,13 +58,23 @@ class _MainAppState extends State<MainApp> {
                         Flexible(
                           flex: 3,
                           child: TextField(
+                            onTapAlwaysCalled: true,
                             controller: MyTodoBox.currTxt,
+                            onSubmitted: (value) {
+                              setState(() {
+                                if(MyTodoBox.currTxt.text!="") {
+                                  MyTodoBox().addTodo(MyTodoBox.currTxt.text, false);
+                                  MyTodoBox.currTxt.text = "";
+                                }
+                              });
+                            },
                             decoration: const InputDecoration(
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
-                                      color: Colors.grey, width: 0.0),
+                                      color: Colors.grey,
+                                      width: 1.0),
                                 ),
-                                focusedBorder: OutlineInputBorder(
+                                focusedBorder: const OutlineInputBorder(
                                   borderSide: BorderSide(
                                       color: Color(0xff456672), width: 2.0),
                                 ),
@@ -84,9 +94,10 @@ class _MainAppState extends State<MainApp> {
                             ),
                             onPressed: () {
                               setState(() {
-                                  MyTodoBox()
-                                      .addTodo(MyTodoBox.currTxt.text, false);
+                                if(MyTodoBox.currTxt.text!="") {
+                                  MyTodoBox().addTodo(MyTodoBox.currTxt.text, false);
                                   MyTodoBox.currTxt.text = "";
+                                }
                               });
                             },
                           ),
@@ -97,94 +108,99 @@ class _MainAppState extends State<MainApp> {
                 ),
                 Flexible(
                     flex: 5,
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(0,10,0,0),
-                      child: ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          itemCount: MyTodoBox.mybox.get('todoList').length == 0
-                              ? 0
-                              : MyTodoBox.mybox.get('todoList').length,
-                          itemBuilder: (context, index) => Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              // show todo
-                              Flexible(
-                                flex: 3,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                    MyTodoBox.mybox.get('todoList')[index][1] =
-                                        !MyTodoBox.mybox.get('todoList')[index][1];
-                                    });
-                                  },
-                                  child: AutoSizeText(
-                                    "- ${MyTodoBox.mybox.get('todoList')[index][0]}",
-                                    style: TextStyle(
-                                        color: MyTodoBox.mybox.get('todoList')[index][1]?
-                                        Color(0xff7a7a7a): Color(0xff456672),
-                                        fontSize: 30,
-                                        decoration: MyTodoBox.mybox
-                                                .get("todoList")[index][1]
-                                            ? TextDecoration.lineThrough
-                                            : null),
-                                    maxFontSize: 50,
-                                    minFontSize: 5,
-                                    maxLines: 3,
-                                  ),
+                    child: ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
+                        physics: const ClampingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: MyTodoBox.mybox.get('todoList').length == 0
+                            ? 0
+                            : MyTodoBox.mybox.get('todoList').length,
+                        itemBuilder: (context, index) => Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // show todo
+                            Flexible(
+                              flex: 3,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                  MyTodoBox.mybox.get('todoList')[index][1] =
+                                      !MyTodoBox.mybox.get('todoList')[index][1];
+                                  });
+                                },
+                                child: AutoSizeText(
+                                  "- ${MyTodoBox.mybox.get('todoList')[index][0]}",
+                                  style: TextStyle(
+                                      color: MyTodoBox.mybox.get('todoList')[index][1]?
+                                      Color(0xff7a7a7a): Color(0xff456672),
+                                      fontSize: 30,
+                                      decoration: MyTodoBox.mybox
+                                              .get("todoList")[index][1]
+                                          ? TextDecoration.lineThrough
+                                          : null),
+                                  maxFontSize: 50,
+                                  minFontSize: 5,
+                                  maxLines: 3,
                                 ),
                               ),
-                              // edit button
-                              Flexible(
-                                flex: 1,
-                                child: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        MyTodoBox.currTxt.text = MyTodoBox.mybox
-                                            .get('todoList')[index][0];
-                                        MyTodoBox().removeTodo(index);
-                                      });
-                                    },
-                                    icon: const Icon(
-                                      IconlyBold.edit,
-                                      color: Color(0xff555273),
-                                      size: 30,
-                                    )),
-                              ),
-                              // remove button
-                              Flexible(
-                                flex: 1,
-                                child: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        MyTodoBox().removeTodo(index);
-                                      });
-                                    },
-                                    icon: const Icon(
-                                      IconlyBold.delete,
-                                      color: Color(0xffda5151),
-                                      size: 30,
-                                    )),
-                              )
-                            ],
-                          ),
+                            ),
+                            // edit button
+                            Flexible(
+                              flex: 1,
+                              child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      MyTodoBox.currTxt.text = MyTodoBox.mybox
+                                          .get('todoList')[index][0];
+                                      MyTodoBox().removeTodo(index);
+                                    });
+                                  },
+                                  icon: const Icon(
+                                    IconlyBold.edit,
+                                    color: Color(0xff555273),
+                                    size: 30,
+                                  )),
+                            ),
+                            // remove button
+                            Flexible(
+                              flex: 1,
+                              child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      MyTodoBox().removeTodo(index);
+                                    });
+                                  },
+                                  icon: const Icon(
+                                    IconlyBold.delete,
+                                    color: Color(0xffda5151),
+                                    size: 30,
+                                  )),
+                            )
+                          ],
                         ),
-                    ))
+                      ))
               ],
             ),
           )),
     );
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // TODO: implement dispose
+    Hive.close();
+  }
 }
 
 class MyTodoBox {
   static var currTxt = TextEditingController();
-  static var mybox = Hive.box("todoBox");
+  static var mybox = Hive.box('todoBox');
 
   void addTodo(String todo, bool isDone) async {
     mybox.get('todoList').add([todo, isDone]);
-    print(mybox);
   }
 
   void removeTodo(int index) async {
