@@ -128,12 +128,14 @@ class _MainAppState extends State<MainApp> {
                               flex: 3,
                               child: GestureDetector(
                                 onTap: () {
-                                  setState(() {
+                                  setState(() async {
                                     int i = -1;
                                     MyTodoBox._todoBox.toMap().forEach((k, v)=>{
-                                      if(v=tempList[index]){i = k}
+                                      if(v=tempList[index]){i = k},
+                                      print(i),
+                                      print(MyTodoBox._todoBox.getAt(i))
                                     });
-                                  i!=-1?MyTodoBox._todoBox.putAt(
+                                  i!=-1?await MyTodoBox._todoBox.putAt(
                                       i,
                                       [(tempList[index][0]),
                                         (!tempList[index][1])]
