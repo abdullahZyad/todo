@@ -72,11 +72,6 @@ class _MainAppState extends State<MainApp> {
                                 labelText: 'اكتب مهمتك الجديدة',
                                 labelStyle: TextStyle(color: Color(0xff456672)),
                                 fillColor: Color(0xff000000)),
-                            onChanged: (String todo) {
-                              setState(() {
-                                MyTodoBox.currTxt.text = todo;
-                              });
-                            },
                           ),
                         ),
                         // add button
