@@ -10,7 +10,7 @@ void main() async {
 
   await Hive.initFlutter();
   await Hive.openBox('todoBox');
-
+  MyTodoBox._todoBox = Hive.box('todoBox');
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
   runApp(const MaterialApp(
@@ -198,7 +198,7 @@ class _MainAppState extends State<MainApp> {
 
 class MyTodoBox {
   static var currTxt = TextEditingController();
-  static final _todoBox = Hive.box('todoBox');
+  static late final _todoBox;
 
   void addTodo(List l) async {
     await _todoBox.add(l);
