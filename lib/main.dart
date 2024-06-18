@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:iconly/iconly.dart';
-import 'package:timeline_tile/timeline_tile.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -85,11 +84,9 @@ class _MainAppState extends State<MainApp> {
                             ),
                             onPressed: () {
                               setState(() {
-                                if (MyTodoBox.currTxt.text.isNotEmpty) {
                                   MyTodoBox()
                                       .addTodo(MyTodoBox.currTxt.text, false);
                                   MyTodoBox.currTxt.text = "";
-                                }
                               });
                             },
                           ),
@@ -102,36 +99,16 @@ class _MainAppState extends State<MainApp> {
                     flex: 5,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0,10,0,0),
-                      child: SingleChildScrollView(
-                        child: ListView.builder(
+                      child: ListView.builder(
                           scrollDirection: Axis.vertical,
                           shrinkWrap: true,
                           itemCount: MyTodoBox.mybox.get('todoList').length == 0
                               ? 0
                               : MyTodoBox.mybox.get('todoList').length,
                           itemBuilder: (context, index) => Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              TimelineTile(
-                                alignment: index == 0
-                                    ? TimelineAlign.start
-                                    : index ==
-                                            MyTodoBox.mybox
-                                                    .get('todoList')
-                                                    .length - 1
-                                        ? TimelineAlign.end
-                                        : TimelineAlign.center,
-                                isFirst: index == 0 ? true : false,
-                                isLast: index ==
-                                        MyTodoBox.mybox.get('todoList').length - 1
-                                    ? true
-                                    : false,
-                                axis: TimelineAxis.vertical,
-                                indicatorStyle: IndicatorStyle(
-                                    indicator: Icon(
-                                        MyTodoBox.mybox.get('todoList')[index][1]
-                                            ? IconlyBold.tick_square
-                                            : IconlyBold.time_circle)),
-                              ),
                               // show todo
                               GestureDetector(
                                 onTap: () {
@@ -150,7 +127,7 @@ class _MainAppState extends State<MainApp> {
                                           : null),
                                   maxFontSize: 50,
                                   minFontSize: 5,
-                                  maxLines: 4,
+                                  maxLines: 1,
                                 ),
                               ),
                               // edit button
@@ -190,7 +167,6 @@ class _MainAppState extends State<MainApp> {
                             ],
                           ),
                         ),
-                      ),
                     ))
               ],
             ),
