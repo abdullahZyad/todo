@@ -38,6 +38,8 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
+    List tempList = [];
+    MyTodoBox._todoBox.foreach((k, v) => {tempList.add(v)});
     return SafeArea(
       child: Scaffold(
           backgroundColor: const Color(0xffe2eff1),
@@ -112,7 +114,7 @@ class _MainAppState extends State<MainApp> {
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
-                        itemCount: MyTodoBox._todoBox.toMap().length,
+                        itemCount: tempList.length,
                         itemBuilder: (context, index) => Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -124,19 +126,23 @@ class _MainAppState extends State<MainApp> {
                                 onTap: () {
                                   setState(() {
                                   MyTodoBox._todoBox.putAt(
-                                      index,
-                                      [(MyTodoBox._todoBox.getAt(index)[0]),
-                                        (!MyTodoBox._todoBox.getAt(index)[1])]
+                                      MyTodoBox._todoBox.keys.firstWhere(
+                                              (k)=>MyTodoBox._todoBox[k][0]
+                                          == tempList[index][0],
+                                        orElse: ()=> null
+                                      ),
+                                      [(tempList[index][0]),
+                                        (!tempList[index][1])]
                                   );
                                   });
                                 },
                                 child: AutoSizeText(
-                                  "• ${MyTodoBox._todoBox.getAt(index)[0]}",
+                                  "• ${tempList[index][0]}",
                                   style: TextStyle(
-                                      color: MyTodoBox._todoBox.getAt(index)[1]?
+                                      color: tempList[index][1]?
                                       const Color(0xff7a7a7a): const Color(0xff456672),
                                       fontSize: 30,
-                                      decoration: MyTodoBox._todoBox.getAt(index)[1]
+                                      decoration: tempList[index][1]
                                           ? TextDecoration.lineThrough
                                           : null
                                   ),
@@ -152,8 +158,8 @@ class _MainAppState extends State<MainApp> {
                               child: IconButton(
                                   onPressed: () {
                                     setState(() async {
-                                      MyTodoBox.currTxt.text = MyTodoBox._todoBox.getAt(index)[0];
-                                      await MyTodoBox().removeTodo(MyTodoBox._todoBox.getAt(index));
+                                      MyTodoBox.currTxt.text = tempList[index][0];
+                                      await MyTodoBox().removeTodo(tempList[index]);
                                     });
                                   },
                                   icon: const Icon(
@@ -168,7 +174,7 @@ class _MainAppState extends State<MainApp> {
                               child: IconButton(
                                   onPressed: () {
                                     setState(() async {
-                                      await MyTodoBox().removeTodo(MyTodoBox._todoBox.getAt(index));
+                                      await MyTodoBox().removeTodo(tempList[index]);
                                     });
                                   },
                                   icon: const Icon(
@@ -199,10 +205,14 @@ class MyTodoBox {
   static late final _todoBox;
 
   Future<void> addTodo(List l) async {
-    await _todoBox.add(l);
+    bool b = true;
+    await _todoBox.forEach((k, v) => {if(v[0]==l[0]){b=false}});
+    if(b) {
+      _todoBox.add(l);
+    }
   }
 
   Future<void> removeTodo(List l) async {
-    await _todoBox.remove(l);
+    await _todoBox.forEach((k, v) => {if(v==l){_todoBox.remove(k)}});
   }
 }
