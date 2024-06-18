@@ -129,15 +129,15 @@ class _MainAppState extends State<MainApp> {
                               child: GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                  MyTodoBox._todoBox.putAt(
-                                      MyTodoBox._todoBox.toMap().keys.firstWhere(
-                                              (k)=>MyTodoBox._todoBox[k][0]
-                                          == tempList[index][0],
-                                        orElse: ()=> null
-                                      ),
+                                    int i = -1;
+                                    MyTodoBox._todoBox.toMap().forEach((k, v)=>{
+                                      if(v=tempList[index]){i = k}
+                                    });
+                                  i!=-1?MyTodoBox._todoBox.putAt(
+                                      i,
                                       [(tempList[index][0]),
                                         (!tempList[index][1])]
-                                  );
+                                  ):null;
                                   });
                                 },
                                 child: AutoSizeText(
@@ -182,7 +182,7 @@ class _MainAppState extends State<MainApp> {
                                     });
                                   },
                                   icon: const Icon(
-                                    Icons.remove_circle_outline,
+                                    Icons.remove_circle,
                                     color: Color(0xffda5151),
                                     size: 30,
                                   )),
@@ -217,6 +217,8 @@ class MyTodoBox {
   }
 
   Future<void> removeTodo(List l) async {
-    _todoBox.toMap().forEach((k, v) async => {if(v==l){await _todoBox.delelte(k)}});
+    int key=-1;
+    _todoBox.toMap().forEach((k, v) => {if(v==l){key=k,print(k)}});
+    key!=-1?_todoBox.delete(key):null;
   }
 }
