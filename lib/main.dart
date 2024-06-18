@@ -39,7 +39,11 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     List tempList = [];
-    MyTodoBox._todoBox.toMap().forEach((k, v) => {tempList.add(v)});
+    if(MyTodoBox._todoBox.toMap().length!=0) {
+      MyTodoBox._todoBox.toMap().forEach((k, v) => {tempList.add(v)});
+      print(MyTodoBox._todoBox.toMap());
+    }
+    print(tempList);
     return SafeArea(
       child: Scaffold(
           backgroundColor: const Color(0xffe2eff1),
@@ -126,7 +130,7 @@ class _MainAppState extends State<MainApp> {
                                 onTap: () {
                                   setState(() {
                                   MyTodoBox._todoBox.putAt(
-                                      MyTodoBox._todoBox.keys.firstWhere(
+                                      MyTodoBox._todoBox.toMap().keys.firstWhere(
                                               (k)=>MyTodoBox._todoBox[k][0]
                                           == tempList[index][0],
                                         orElse: ()=> null
@@ -213,6 +217,6 @@ class MyTodoBox {
   }
 
   Future<void> removeTodo(List l) async {
-    _todoBox.toMap().forEach((k, v) async => {if(v==l){await _todoBox.remove(k)}});
+    _todoBox.toMap().forEach((k, v) async => {if(v[0]==l[0]){await _todoBox.remove(k)}});
   }
 }
