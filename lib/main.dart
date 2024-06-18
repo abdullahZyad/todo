@@ -41,9 +41,7 @@ class _MainAppState extends State<MainApp> {
     List tempList = [];
     if(MyTodoBox._todoBox.toMap().length!=0) {
       MyTodoBox._todoBox.toMap().forEach((k, v) => {tempList.add(v)});
-      print(MyTodoBox._todoBox.toMap());
     }
-    print(tempList);
     return SafeArea(
       child: Scaffold(
           backgroundColor: const Color(0xffe2eff1),
@@ -127,9 +125,9 @@ class _MainAppState extends State<MainApp> {
                             Flexible(
                               flex: 3,
                               child: GestureDetector(
-                                onTap: () async {
-                                  setState(() async {
-                                    await MyTodoBox().updateIsDone(tempList[index]);
+                                onTap: () {
+                                  setState(() {
+                                    MyTodoBox().updateIsDone(tempList[index]);
                                   });
                                 },
                                 child: AutoSizeText(
@@ -210,19 +208,17 @@ class MyTodoBox {
 
   Future<void> removeTodo(List l) async {
     int key=-1;
-    _todoBox.toMap().forEach((k, v) => {if(v==l){key=k,print(k)}});
+    _todoBox.toMap().forEach((k, v) => {if(v==l){key=k}});
     key!=-1?await _todoBox.delete(key):null;
   }
 
   Future<void> updateIsDone(List l) async {
     int key=-1;
-    _todoBox.toMap().forEach((k, v) => {if(v==l){key=k,print(k)}});
-    key!=-1?
-    await MyTodoBox._todoBox.putAt(
+    _todoBox.toMap().forEach((k, v) => {if(v==l){key=k}});
+    await MyTodoBox._todoBox.put(
         key,
-        [l[0],
-          !(l[1])]
-    ):null;
+        [l[0],!(l[1])]
+    );
   }
 
 }
