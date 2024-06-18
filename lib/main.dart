@@ -190,8 +190,7 @@ class _MainAppState extends State<MainApp> {
   @override
   void dispose() {
     super.dispose();
-    // TODO: implement dispose
-    Hive.close();
+    MyTodoBox.mybox.close();
   }
 }
 
