@@ -39,9 +39,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          backgroundColor: (DateTime.now().hour > 20 || DateTime.now().hour < 4)
-              ? const Color(0xff555273)
-              : const Color(0xffe2eff1),
+          backgroundColor: const Color(0xffe2eff1),
           body: Padding(
             padding: const EdgeInsets.all(15),
             child: Column(
@@ -111,7 +109,6 @@ class _MainAppState extends State<MainApp> {
                     flex: 5,
                     child: ListView.builder(
                       padding: const EdgeInsets.fromLTRB(10, 5, 10, 0),
-                        physics: const ClampingScrollPhysics(),
                         scrollDirection: Axis.vertical,
                         shrinkWrap: true,
                         itemCount: MyTodoBox._todoBox.toMap().length,
@@ -133,7 +130,7 @@ class _MainAppState extends State<MainApp> {
                                   });
                                 },
                                 child: AutoSizeText(
-                                  "- ${MyTodoBox._todoBox.getAt(index)[0]}",
+                                  "• ${MyTodoBox._todoBox.getAt(index)[0]}",
                                   style: TextStyle(
                                       color: MyTodoBox._todoBox.getAt(index)[1]?
                                       const Color(0xff7a7a7a): const Color(0xff456672),
@@ -153,9 +150,9 @@ class _MainAppState extends State<MainApp> {
                               flex: 1,
                               child: IconButton(
                                   onPressed: () {
-                                    setState(() {
+                                    setState(() async {
                                       MyTodoBox.currTxt.text = MyTodoBox._todoBox.getAt(index)[0];
-                                      MyTodoBox().removeTodo(index);
+                                      await MyTodoBox().removeTodo(MyTodoBox._todoBox.getAt(index));
                                     });
                                   },
                                   icon: const Icon(
@@ -169,12 +166,12 @@ class _MainAppState extends State<MainApp> {
                               flex: 1,
                               child: IconButton(
                                   onPressed: () {
-                                    setState(() {
-                                      MyTodoBox().removeTodo(index);
+                                    setState(() async {
+                                      await MyTodoBox().removeTodo(MyTodoBox._todoBox.getAt(index));
                                     });
                                   },
                                   icon: const Icon(
-                                    Icons.remove,
+                                    Icons.remove_circle_outline,
                                     color: Color(0xffda5151),
                                     size: 30,
                                   )),
@@ -200,11 +197,11 @@ class MyTodoBox {
   static var currTxt = TextEditingController();
   static late final _todoBox;
 
-  void addTodo(List l) async {
+  Future<void> addTodo(List l) async {
     await _todoBox.add(l);
   }
 
-  void removeTodo(int key) async {
-    await _todoBox.delete(key);
+  Future<void> removeTodo(List l) async {
+    await _todoBox.remove(l);
   }
 }
