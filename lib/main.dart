@@ -33,75 +33,8 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-
   @override
   Widget build(BuildContext context) {
-    MyTodoBox.toDoRows = [];
-    for(int index = 0; index<MyTodoBox.mybox.get('todoList').length; index++) {
-      MyTodoBox.toDoRows.add(
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // show todo
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    MyTodoBox.mybox.get('todoList')[index][1] =
-                    !MyTodoBox.mybox.get('todoList')[index][1];
-                  });
-                },
-                child: AutoSizeText(
-                  MyTodoBox.mybox.get('todoList')[index][0],
-                  style: TextStyle(
-                      fontSize: 50,
-                      decoration: MyTodoBox.mybox
-                          .get("todoList")[index][1]
-                          ? TextDecoration.lineThrough
-                          : null),
-                  maxFontSize: 50,
-                  minFontSize: 5,
-                  maxLines: 1,
-                ),
-              ),
-              // edit button
-              IconButton(
-                  onPressed: () {
-                    setState(() {
-                      MyTodoBox.currTxt.text = MyTodoBox.mybox
-                          .get('todoList')[index][0];
-                      MyTodoBox().removeTodo(
-                          MyTodoBox.mybox.get('todoList')[index]
-                          [0],
-                          MyTodoBox.mybox.get('todoList')[index]
-                          [1]);
-                    });
-                  },
-                  icon: const Icon(
-                    IconlyBold.edit,
-                    color: Color(0xff555273),
-                    size: 30,
-                  )),
-              // remove button
-              IconButton(
-                  onPressed: () {
-                    setState(() {
-                      MyTodoBox().removeTodo(
-                          MyTodoBox.mybox.get('todoList')[index]
-                          [0],
-                          MyTodoBox.mybox.get('todoList')[index]
-                          [1]);
-                    });
-                  },
-                  icon: const Icon(
-                    IconlyBold.delete,
-                    color: Color(0xffda5151),
-                    size: 30,
-                  ))
-            ],
-          )
-      );
-    }
     Hive.openBox('todoList');
     return SafeArea(
       child: Scaffold(
@@ -166,11 +99,77 @@ class _MainAppState extends State<MainApp> {
                     flex: 5,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(0,10,0,0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: MyTodoBox.toDoRows,
+                      child: ListView.builder(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          itemCount: MyTodoBox.mybox.get('todoList').length == 0
+                              ? 0
+                              : MyTodoBox.mybox.get('todoList').length,
+                          itemBuilder: (context, index) => Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // show todo
+                              Flexible(
+                                flex: 3,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                    MyTodoBox.mybox.get('todoList')[index][1] =
+                                        !MyTodoBox.mybox.get('todoList')[index][1];
+                                    });
+                                  },
+                                  child: AutoSizeText(
+                                    "- ${MyTodoBox.mybox.get('todoList')[index][0]}",
+                                    style: TextStyle(
+                                        color: MyTodoBox.mybox.get('todoList')[index][1]?
+                                        Color(0xff7a7a7a): Color(0xff456672),
+                                        fontSize: 30,
+                                        decoration: MyTodoBox.mybox
+                                                .get("todoList")[index][1]
+                                            ? TextDecoration.lineThrough
+                                            : null),
+                                    maxFontSize: 50,
+                                    minFontSize: 5,
+                                    maxLines: 3,
+                                  ),
+                                ),
+                              ),
+                              // edit button
+                              Flexible(
+                                flex: 1,
+                                child: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        MyTodoBox.currTxt.text = MyTodoBox.mybox
+                                            .get('todoList')[index][0];
+                                        MyTodoBox().removeTodo(index);
+                                      });
+                                    },
+                                    icon: const Icon(
+                                      IconlyBold.edit,
+                                      color: Color(0xff555273),
+                                      size: 30,
+                                    )),
+                              ),
+                              // remove button
+                              Flexible(
+                                flex: 1,
+                                child: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        MyTodoBox().removeTodo(index);
+                                      });
+                                    },
+                                    icon: const Icon(
+                                      IconlyBold.delete,
+                                      color: Color(0xffda5151),
+                                      size: 30,
+                                    )),
+                              )
+                            ],
+                          ),
                         ),
-                      )
                     ))
               ],
             ),
@@ -182,12 +181,13 @@ class _MainAppState extends State<MainApp> {
 class MyTodoBox {
   static var currTxt = TextEditingController();
   static var mybox = Hive.box("todoBox");
-  static List<Row> toDoRows = [];
+
   void addTodo(String todo, bool isDone) async {
-    mybox.get('todoList').add[[todo, isDone]];
+    mybox.get('todoList').add([todo, isDone]);
+    print(mybox);
   }
 
-  void removeTodo(String todo, bool isDone) async {
-    mybox.get('todoList').remove[[todo, isDone]];
+  void removeTodo(int index) async {
+    mybox.get('todoList').removeAt(index);
   }
 }
